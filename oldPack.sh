@@ -1,10 +1,12 @@
 # /bin/bash
 # 工程名
 APP_NAME="StudentLoan"
-# app 类型   xcodeproj,xcworkspace
-APP_TYPE="xcodeproj"
 #scheme
 SCHEME="StudentLoan"
+# app 类型   xcodeproj,xcworkspace
+APP_TYPE="xcodeproj"
+# Debug Release
+PackageMode="Release"
 #method  development, app-store, ad-hoc, enterprise
 method="enterprise"
 #DevelopmentTeam
@@ -32,9 +34,19 @@ IPANAME="${APP_NAME}_V${bundleShortVersion}_${DATE}.ipa"
 
 sed -i '' "s/Automatic/Manual/g"  "${PROJECT_PATH}/${APP_NAME}.xcodeproj/project.pbxproj"
 
-if [ ! -d "Release-iphoneos" ]; then 
-mkdir "Release-iphoneos" 
-fi 
+BundlePath="NULL"
+
+if [ ${PackageMode} =  "Release" ];then
+	BundlePath="Release-iphoneos"
+	if [ ! -d "Release-iphoneos" ]; then 
+	mkdir "Release-iphoneos" 
+	fi 
+else 
+	BundlePath="Debug-iphoneos"
+	if [ ! -d "Debug-iphoneos" ]; then 
+	mkdir "Debug-iphoneos" 
+	fi
+fi
 
 
 if [ ! -d "ipa" ]; then 
@@ -44,15 +56,16 @@ fi
 if [ ${APP_TYPE} = "xcworkspace" ]; then
  	xcodebuild -workspace  "${PROJECT_PATH}/${APP_NAME}.xcworkspace" -scheme "${SCHEME}" -sdk iphoneos  PRODUCT_BUNDLE_IDENTIFIER="${bundleID}" DevelopmentTeam="${DevelopmentTeam}" \
  	DEVELOPMENT_TEAM="${DevelopmentTeam}" CODE_SIGN_IDENTITY="${CODE_SIGN_DISTRIBUTION}" \
-  	PROVISIONING_PROFILE_SPECIFIER="${PROVISIONING_PROFILE_SPECIFIER}"  SYMROOT="$(PWD)" CONFIGURATION_BUILD_DIR="${PROJECT_PATH}/Release-iphoneos"
+  	PROVISIONING_PROFILE_SPECIFIER="${PROVISIONING_PROFILE_SPECIFIER}"  SYMROOT="$(PWD)" -configuration "${PackageMode}"
 elif [ ${APP_TYPE} = "xcodeproj" ]; then
     xcodebuild -target "${APP_NAME}" PRODUCT_BUNDLE_IDENTIFIER="${bundleID}" DevelopmentTeam="${DevelopmentTeam}" \
-    DEVELOPMENT_TEAM="${DevelopmentTeam}" CODE_SIGN_IDENTITY="${CODE_SIGN_DISTRIBUTION}" \
+    DEVELOPMENT_TEAM="${DevelopmentTeam}" CODE_SIGN_IDENTITY="${CODE_SIGN_DISTRIBUTION}"  -configuration "${PackageMode}"\
     PROVISIONING_PROFILE_SPECIFIER="${PROVISIONING_PROFILE_SPECIFIER}"  SYMROOT="$(PWD)"
 fi	     
 
+echo "${BundlePath}"
 
-xcrun -sdk iphoneos PackageApplication "./Release-iphoneos/${APP_NAME}.app" -o "${PROJECT_PATH}/${IPANAME}"
+xcrun -sdk iphoneos PackageApplication "./${BundlePath}/${APP_NAME}.app" -o "${PROJECT_PATH}/${IPANAME}"
 
 #    ipa
 echo "${PROJECT_PATH}/ipa/${APP_NAME}"
