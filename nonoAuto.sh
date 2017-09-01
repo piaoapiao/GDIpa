@@ -35,7 +35,7 @@ IPANAME="${APP_NAME}"
 sed -i '' "s/Automatic/Manual/g"  "${PROJECT_PATH}/${APP_NAME}.xcodeproj/project.pbxproj"
 
 
-#是否开启 
+#是否开启
 Nagagin=YES
 if [ ${Nagagin} =  YES ];then
 oldGcc='GCC_VERSION = "";'
@@ -63,44 +63,44 @@ fi
 BundlePath="NULL"
 
 if [ ${PackageMode} =  "Release" ];then
-    BundlePath="Release-iphoneos"
-    if [ ! -d "Release-iphoneos" ]; then 
-    mkdir "Release-iphoneos" 
-    fi 
-else 
-    BundlePath="Debug-iphoneos"
-    if [ ! -d "Debug-iphoneos" ]; then 
-    mkdir "Debug-iphoneos" 
-    fi
+BundlePath="Release-iphoneos"
+if [ ! -d "Release-iphoneos" ]; then
+mkdir "Release-iphoneos"
+fi
+else
+BundlePath="Debug-iphoneos"
+if [ ! -d "Debug-iphoneos" ]; then
+mkdir "Debug-iphoneos"
+fi
 fi
 
 
-if [ ! -d "ipa" ]; then 
-mkdir "ipa" 
-fi 
+if [ ! -d "ipa" ]; then
+mkdir "ipa"
+fi
 
 if [ ${APP_TYPE} = "xcworkspace" ]; then
-    xcodebuild -workspace "${PROJECT_PATH}/${APP_NAME}.${APP_TYPE}" -scheme "${SCHEME}" -configuration "Release" clean \
-    archive -archivePath "${PROJECT_PATH}/${APP_NAME}" \
-    DEVELOPMENT_TEAM=${DevelopmentTeam}  DEVELOPMENT_TEAM="${DevelopmentTeam}" \
-    CODE_SIGN_IDENTITY="${CODE_SIGN_DISTRIBUTION}" \
-    PROVISIONING_PROFILE_SPECIFIER="${PROVISIONING_PROFILE_SPECIFIER}" ProvisioningStyle="Manual" \
-    PRODUCT_BUNDLE_IDENTIFIER="${bundleID}"
+xcodebuild -workspace "${PROJECT_PATH}/${APP_NAME}.${APP_TYPE}" -scheme "${SCHEME}" -configuration "Release" clean \
+archive -archivePath "${PROJECT_PATH}/${APP_NAME}" \
+DEVELOPMENT_TEAM=${DevelopmentTeam}  DEVELOPMENT_TEAM="${DevelopmentTeam}" \
+CODE_SIGN_IDENTITY="${CODE_SIGN_DISTRIBUTION}" \
+PROVISIONING_PROFILE_SPECIFIER="${PROVISIONING_PROFILE_SPECIFIER}" ProvisioningStyle="Manual" PRODUCT_BUNDLE_IDENTIFIER="${bundleID}"
 elif [ ${APP_TYPE} = "xcodeproj" ]; then
-   xcodebuild -project "${PROJECT_PATH}/${APP_NAME}.${APP_TYPE}" -scheme "${SCHEME}" -configuration "Release" clean \
-    archive -archivePath "${PROJECT_PATH}/${APP_NAME}" \
-    DEVELOPMENT_TEAM=${DevelopmentTeam}  DEVELOPMENT_TEAM="${DevelopmentTeam}" \
-    CODE_SIGN_IDENTITY="${CODE_SIGN_DISTRIBUTION}" \
-    PROVISIONING_PROFILE_SPECIFIER="${PROVISIONING_PROFILE_SPECIFIER}" ProvisioningStyle="Manual" \
-    PRODUCT_BUNDLE_IDENTIFIER="${bundleID}"
-fi        
+xcodebuild -project "${PROJECT_PATH}/${APP_NAME}.${APP_TYPE}" -scheme "${SCHEME}" -configuration "Release" clean \
+archive -archivePath "${PROJECT_PATH}/${APP_NAME}" \
+DEVELOPMENT_TEAM=${DevelopmentTeam}  DEVELOPMENT_TEAM="${DevelopmentTeam}" \
+CODE_SIGN_IDENTITY="${CODE_SIGN_DISTRIBUTION}" \
+PROVISIONING_PROFILE_SPECIFIER="${PROVISIONING_PROFILE_SPECIFIER}" ProvisioningStyle="Manual" \
+PRODUCT_BUNDLE_IDENTIFIER="${bundleID}" \
+OTHER_CFLAGS="-mllvm -reorder-bb -mllvm -split -mllvm -split-num=3 -mllvm -flatten -mllvm -zlog"
+fi
 
 echo "${BundlePath}"
 
 echo "${BundlePath}"
 
-echo "<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
+echo "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 <key>method</key>
 <string>development</string>
@@ -138,4 +138,3 @@ rm -r "${PROJECT_PATH}/${APP_NAME}.xcarchive"
 rm -r "${PROJECT_PATH}/exportOptions.plist"
 rm -r  "${PROJECT_PATH}/Release-iphoneos/"
 #rm -r "${PROJECT_PATH}/ipa"
-
